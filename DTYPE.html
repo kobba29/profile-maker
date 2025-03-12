@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロフィールメーカー</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body { font-family: "Arial", sans-serif; text-align: center; background-color: #f4f4f4; }
+        .container { max-width: 400px; margin: auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .profile-card { display: none; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-top: 20px; }
+        img { max-width: 100px; border-radius: 50%; }
+    </style>
+</head>
+<body>
+    <h2>プロフィールメーカー</h2>
+    <div class="container">
+        <label>名前：</label><input type="text" id="name"><br><br>
+        <label>呼び名：</label><input type="text" id="nickname"><br><br>
+        <label>年代：</label><input type="text" id="age"><br><br>
+        <label>住んでいる場所：</label><input type="text" id="location"><br><br>
+        <label>好きなもの：</label><input type="text" id="favorite"><br><br>
+        <label>趣味：</label><input type="text" id="hobby"><br><br>
+        <label>勉強したいこと：</label><input type="text" id="study"><br><br>
+        <label>ひと言：</label><input type="text" id="comment"><br><br>
+        <label>画像をアップロード：</label>
+        <input type="file" id="imageInput" accept="image/*"><br><br>
+        <button onclick="generateProfile()">プロフィールを作成</button>
+        <button onclick="saveProfile()">保存</button>
+        <button onclick="loadProfile()">読み込み</button>
+        <button onclick="saveAsImage()">画像として保存</button>
+    </div>
+
+    <div class="profile-card" id="profileCard">
+        <h3 id="cardName"></h3>
+        <p id="cardNickname"></p>
+        <p id="cardAge"></p>
+        <p id="cardLocation"></p>
+        <p id="cardFavorite"></p>
+        <p id="cardHobby"></p>
+        <p id="cardStudy"></p>
+        <p id="cardComment"></p>
+        <img id="cardImage" src="" alt="プロフィール画像">
+    </div>
+
+    <script>
+        function generateProfile() {
+            const name = document.getElementById('name').value;
+            const nickname = document.getElementById('nickname').value;
+            const age = document.getElementById('age').value;
+            const location = document.getElementById('location').value;
+            const favorite = document.getElementById('favorite').value;
+            const hobby = document.getElementById('hobby').value;
+            const study = document.getElementById('study').value;
+            const comment = document.getElementById('comment').value;
+            const imageInput = document.getElementById('imageInput').files[0];
+            
+            if (!name || !favorite) {
+                alert('名前と好きなものを入力してください！');
+                return;
+            }
+            
+            document.getElementById('cardName').innerText = '名前: ' + name;
+            document.getElementById('cardNickname').innerText = '呼び名: ' + nickname;
+            document.getElementById('cardAge').innerText = '年代: ' + age;
+            document.getElementById('cardLocation').innerText = '住んでいる場所: ' + location;
+            document.getElementById('cardFavorite').innerText = '好きなもの: ' + favorite;
+            document.getElementById('cardHobby').innerText = '趣味: ' + hobby;
+            document.getElementById('cardStudy').innerText = '勉強したいこと: ' + study;
+            document.getElementById('cardComment').innerText = 'ひと言: ' + comment;
+            
+            if (imageInput) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('cardImage').src = e.target.result;
+                }
+                reader.readAsDataURL(imageInput);
+            }
+            
+            document.getElementById('profileCard').style.display = 'block';
+        }
+
+        function saveProfile() {
+            const profileData = {
+                name: document.getElementById('name').value,
+                nickname: document.getElementById('nickname').value,
+                age: document.getElementById('age').value,
+                location: document.getElementById('location').value,
+                favorite: document.getElementById('favorite').value,
+                hobby: document.getElementById('hobby').value,
+                study: document.getElementById('study').value,
+                comment: document.getElementById('comment').value,
+            };
+            localStorage.setItem('profile', JSON.stringify(profileData));
+            alert('プロフィールを保存しました！');
+        }
+
+        function loadProfile() {
+            const profileData = JSON.parse(localStorage.getItem('profile'));
+            if (profileData) {
+                document.getElementById('name').value = profileData.name;
+                document.getElementById('nickname').value = profileData.nickname;
+                document.getElementById('age').value = profileData.age;
+                document.getElementById('location').value = profileData.location;
+                document.getElementById('favorite').value = profileData.favorite;
+                document.getElementById('hobby').value = profileData.hobby;
+                document.getElementById('study').value = profileData.study;
+                document.getElementById('comment').value = profileData.comment;
+                alert('プロフィールを読み込みました！');
+            } else {
+                alert('保存されたプロフィールがありません！');
+            }
+        }
+
+        function saveAsImage() {
+            const profileCard = document.getElementById('profileCard');
+            html2canvas(profileCard).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'profile.png';
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
